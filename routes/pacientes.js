@@ -10,7 +10,21 @@ router.get('/', (req, res, next) => {
             'SELECT * FROM pacientes;',
             (error, result, fields) => {
                 if(error) {return res.status(500).send({error: error})}
-                return res.status(200).send({response: result})
+                const response = {
+                    pacientes: result.map(pac => {
+                        return {
+                            id_paciente: pac.idpacientes,
+                            nome: pac.nome,
+                            request: {
+                                tipo: 'GET',
+                                descricao: 'Retorna todos pacientes',
+                                url: 'http://localhost:3000/pacientes/' + pac.idpacientes
+                            }
+                        }
+
+                    })
+                }
+                return res.status(200).send({response})
             }
         )
     });
@@ -43,10 +57,20 @@ router.post('/', (req, res, next) => {
 
                 if(error) {return res.status(500).send({error: error})}
 
-                res.status(201).send({
-                    mensagem: 'Novo paciente cadastrado',
-                    id_paciente: result.insertId
-                });
+                const response = {
+                    mensagem : 'Paciente cadastrado com sucesso',
+                    response: {
+                        id_paciente : result.insertId,
+                        nome: req.body.nome,
+                        request: {
+                            tipo: 'POST',
+                            descricao: 'Ver todos os pacientes',
+                            url: 'http://localhost:3000/pacientes'
+                        }
+                    }
+                }
+
+                res.status(201).send(response);
             }
         )
     });

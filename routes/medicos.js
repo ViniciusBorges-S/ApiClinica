@@ -10,7 +10,24 @@ router.get('/', (req, res, next) => {
             'SELECT * FROM medicos;',
             (error, result, fields) => {
                 if(error) {return res.status(500).send({error: error})}
-                return res.status(200).send({response: result})
+                
+                const response = {
+                    medicos: result.map(med => {
+                        return {
+                            id_medico: med.idmedicos,
+                            nome: med.nome,
+                            especialidade: med.especialidade,
+                            request: {
+                                tipo: 'GET',
+                                descricao: 'Retorna todos médicos',
+                                url: 'http://localhost:3000/medicos/' + med.idmedicos
+                            }
+                        }
+
+                    })
+                }
+
+                return res.status(200).send({response})
             }
         )
     });
@@ -43,10 +60,21 @@ router.post('/', (req, res, next) => {
 
                 if(error) {return res.status(500).send({error: error})}
 
-                res.status(201).send({
-                    mensagem: 'Novo médico cadastrado',
-                    id_medico: result.insertId
-                });
+                const response = {
+                    mensagem : 'Médico cadastrado com sucesso',
+                    response: {
+                        id_medico : result.insertId,
+                        nome: req.body.nome,
+                        especialidade: req.body.especialidade,
+                        request: {
+                            tipo: 'POST',
+                            descricao: 'Ver todos os médicos',
+                            url: 'http://localhost:3000/medicos'
+                        }
+                    }
+                }
+
+                res.status(201).send(response);
             }
         )
     });
